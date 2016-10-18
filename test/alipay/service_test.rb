@@ -62,6 +62,32 @@ class Alipay::ServiceTest < Minitest::Test
     assert_equal 'https://mapi.alipay.com/gateway.do?service=refund_fastpay_by_platform_pwd&_input_charset=utf-8&partner=1000000000000000&seller_user_id=1000000000000000&refund_date=2015-01-01+00%3A00%3A00&batch_num=1&detail_data=1%5E0.01%5Etest&batch_no=123456789&notify_url=%2Fsome_url&sign_type=MD5&sign=def57a58e1ac21f70c45e41bd3697368', Alipay::Service.refund_fastpay_by_platform_pwd_url(options)
   end
 
+  def test_refund_fastpay_by_platform_nopwd
+    response_body = <<-EOF
+      <?xml version="1.0" encoding="utf-8"?>
+      <alipay>
+        <is_success>T</is_success>
+      </alipay>
+    EOF
+    FakeWeb.register_uri(
+      :get,
+      %r|https://mapi\.alipay\.com/gateway\.do\?service=refund_fastpay_by_platform_nopwd.*|,
+      body: response_body
+    )
+    data = [{
+      trade_no: '1',
+      amount: '0.01',
+      reason: 'test'
+    }]
+    options = {
+      batch_no: '123456789',
+      data: data,
+      notify_url: '/some_url',
+      refund_date: '2015-01-01 00:00:00'
+    }
+    assert_equal response_body, Alipay::Service.refund_fastpay_by_platform_nopwd(options)
+  end
+
   def test_forex_refund_url
     options = {
       out_return_no: '1',

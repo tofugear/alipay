@@ -250,6 +250,43 @@ Alipay::Service.refund_fastpay_by_platform_pwd_url(
 
 This is not a complete list of arguments, please read official document: http://download.alipay.com/public/api/base/alipaydirect.zip .
 
+### 即时到帐批量无密退款接口
+
+#### Name
+
+```ruby
+refund_fastpay_by_platform_nopwd
+```
+
+#### Definition
+
+```ruby
+Alipay::Service.refund_fastpay_by_platform_nopwd
+```
+
+#### Example
+
+```ruby
+batch_no = Alipay::Utils.generate_batch_no # refund batch no, you SHOULD store it to db to avoid alipay duplicate refund
+Alipay::Service.refund_fastpay_by_platform_nopwd(
+  batch_no: batch_no,
+  data: [{
+    trade_no: '201504010000001',
+    amount: '10.0',
+    reason: 'REFUND_REASON'
+  }],
+  notify_url: 'https://example.com/orders/20150401000-0001/refund_notify'
+)
+# => '<?xml version="1.0" encoding="utf-8"?><alipay><is_success>T</is_success></alipay>'
+# T=Success, F=Failure, P=Processing
+
+# When fail
+# => '<alipay>
+#      <is_success>F</is_success>
+#      <error>DUPLICATE_BATCH_NO</error>
+#     </alipay>'
+```
+
 ### 关闭交易接口
 
 #### Name
